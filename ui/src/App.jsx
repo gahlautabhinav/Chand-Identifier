@@ -7,21 +7,28 @@ export default function App(){
   const [sel, setSel] = useState(0)
   const [loading, setLoading] = useState(false)
 
-  async function callScan(){
-    setLoading(true)
+ const handleSubmit = async () => {
+    setLoading(true);
     try {
-      const r = await fetch('http://127.0.0.1:8000/scan', {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({text, sandhi:true})
-      })
-      const j = await r.json()
-      setResp(j); setSel(0)
-    } catch(e) {
-      console.error(e)
+      const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000";
+      const res = await fetch(`${API_BASE}/scan`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text,        // user input
+          sandhi: true // pass options if needed
+        })
+      });
+      const data = await res.json();
+      setResp(data);
+    } catch (err) {
+      console.error("API error:", err);
+      alert("Something went wrong. Check console for details.");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false)
-  }
+  };
+
 
   return (
     <div style={{
@@ -310,7 +317,7 @@ export default function App(){
             />
 
             <button
-              onClick={callScan}
+              onClick={handleSubmit}
               disabled={loading || !text.trim()}
               style={{
                 marginTop: '26px',
